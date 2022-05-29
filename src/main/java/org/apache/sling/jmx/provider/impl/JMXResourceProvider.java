@@ -45,29 +45,16 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceProvider;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
 import org.apache.sling.commons.osgi.PropertiesUtil;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.propertytypes.ServiceDescription;
 
-@Component(metatype=true,
-    label="Apache Sling JMX Resource Provider",
-    description="This provider mounts JMX mbeans into the resource tree.")
-@Service(value = ResourceProvider.class)
-@Properties({
-    @Property(name = ResourceProvider.ROOTS, value="/system/sling/monitoring/mbeans",
-            label="Root",
-            description="The mount point of the JMX beans"),
-    @Property(name = ResourceProvider.USE_RESOURCE_ACCESS_SECURITY, boolValue=true, propertyPrivate=true),
-    @Property(name = ResourceProvider.OWNS_ROOTS, boolValue=true, propertyPrivate=true)
-})
 /**
  * Brief summary of a "good" object name:
  *
@@ -85,6 +72,14 @@ import org.apache.sling.commons.osgi.PropertiesUtil;
  * {name property} : is the value of the name property or "{noname}" if no name property is set
  * {all other props} : name/value pairs containing all additional props
  */
+@Component(
+        service = {ResourceProvider.class},
+        property = {
+                ResourceProvider.ROOTS + "=/system/sling/monitoring/mbeans",
+                ResourceProvider.USE_RESOURCE_ACCESS_SECURITY + "=true",
+                ResourceProvider.OWNS_ROOTS + "=true"
+        })
+@ServiceDescription("This provider mounts JMX mbeans into the resource tree.")
 public class JMXResourceProvider implements ResourceProvider {
 
     /** Configured root paths, ending with a slash */

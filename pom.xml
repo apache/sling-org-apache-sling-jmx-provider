@@ -22,15 +22,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.sling</groupId>
-        <artifactId>sling</artifactId>
-        <version>26</version>
+        <artifactId>sling-bundle-parent</artifactId>
+        <version>47</version>
         <relativePath/>
     </parent>
 
     <groupId>org.apache.sling</groupId>
     <artifactId>org.apache.sling.jmx.provider</artifactId>
     <version>1.0.3-SNAPSHOT</version>
-    <packaging>bundle</packaging>
 
     <name>Apache Sling JMX Resource Provider</name>
 
@@ -38,25 +37,19 @@
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-jmx-provider.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-jmx-provider.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf?p=sling-org-apache-sling-jmx-provider.git</url>
+        <tag>HEAD</tag>
     </scm>
+
+    <properties>
+        <sling.java.version>8</sling.java.version>
+        <project.build.outputTimestamp>1</project.build.outputTimestamp>
+    </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-scr-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Private-Package>
-                            org.apache.sling.jmx.provider.impl
-                        </Private-Package>
-                    </instructions>
-                </configuration>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
@@ -76,11 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>org.apache.felix</groupId>
-        	<artifactId>org.apache.felix.scr.annotations</artifactId>
+            <artifactId>osgi.cmpn</artifactId>
         </dependency>
         <dependency>
         	<groupId>org.slf4j</groupId>
@@ -88,7 +77,7 @@
         </dependency>
         <dependency>
         	<groupId>javax.servlet</groupId>
-        	<artifactId>servlet-api</artifactId>
+        	<artifactId>javax.servlet-api</artifactId>
         </dependency>
     </dependencies>
 </project>
