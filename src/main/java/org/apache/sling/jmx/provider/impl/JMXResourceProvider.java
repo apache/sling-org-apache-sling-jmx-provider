@@ -94,8 +94,8 @@ public class JMXResourceProvider implements ResourceProvider {
     @Activate
     protected void activate(final Map<String, Object> props) {
         final String paths[] = PropertiesUtil.toStringArray(props.get(ResourceProvider.ROOTS));
-        final List<String> rootsList = new ArrayList<String>();
-        final List<String> rootsWithSlashList = new ArrayList<String>();
+        final List<String> rootsList = new ArrayList<>();
+        final List<String> rootsWithSlashList = new ArrayList<>();
         if ( paths != null ) {
             for(final String p : paths) {
                 if ( p.length() > 0 ) {
@@ -210,7 +210,7 @@ public class JMXResourceProvider implements ResourceProvider {
         Set<ObjectName> names = allNames;
         if ( prefix != null ) {
             final String pathPrefix = prefix + '/';
-            names = new HashSet<ObjectName>();
+            names = new HashSet<>();
             for(final ObjectName name : allNames) {
                 final String path = this.convertObjectNameToResourcePath(name);
                 if ( path.startsWith(pathPrefix) ) {
@@ -229,7 +229,7 @@ public class JMXResourceProvider implements ResourceProvider {
             if ( info.isRoot || info.mbeanInfo == null ) {
                 // list all MBeans
                 final Set<ObjectName> names = this.queryObjectNames(info.isRoot ? null : info.pathInfo);
-                final Set<String> filteredNames = new HashSet<String>();
+                final Set<String> filteredNames = new HashSet<>();
                 final String prefix = (info.isRoot ? null : info.pathInfo + "/");
                 for(final ObjectName name : names) {
                     final String path = this.convertObjectNameToResourcePath(name);
@@ -304,7 +304,7 @@ public class JMXResourceProvider implements ResourceProvider {
                     } else {
                         parentResource = (MBeanResource)this.getResource(parent.getResourceResolver(), parent.getPath());
                     }
-                    final List<Resource> list = new ArrayList<Resource>();
+                    final List<Resource> list = new ArrayList<>();
                     list.add(new AttributesResource(parent.getResourceResolver(), parent.getPath() + "/mbean:attributes", parentResource));
                     return list.iterator();
                 } else if ( info.pathInfo.equals("mbean:attributes") ) {
@@ -318,7 +318,7 @@ public class JMXResourceProvider implements ResourceProvider {
                     final AttributeList result = parentMBeanResource.getAttributes();
 
                     final MBeanAttributeInfo[] infos = info.mbeanInfo.getAttributes();
-                    final Map<String, MBeanAttributeInfo> infoMap = new HashMap<String, MBeanAttributeInfo>();
+                    final Map<String, MBeanAttributeInfo> infoMap = new HashMap<>();
                     for(final MBeanAttributeInfo i : infos) {
                         infoMap.put(i.getName(), i);
                     }
