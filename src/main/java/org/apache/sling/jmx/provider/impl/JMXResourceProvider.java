@@ -49,11 +49,13 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceProvider;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
-import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * Brief summary of a "good" object name:
@@ -72,14 +74,8 @@ import org.osgi.service.component.propertytypes.ServiceDescription;
  * {name property} : is the value of the name property or "{noname}" if no name property is set
  * {all other props} : name/value pairs containing all additional props
  */
-@Component(
-        service = {ResourceProvider.class},
-        property = {
-                ResourceProvider.ROOTS + "=/system/sling/monitoring/mbeans",
-                ResourceProvider.USE_RESOURCE_ACCESS_SECURITY + "=true",
-                ResourceProvider.OWNS_ROOTS + "=true"
-        })
-@ServiceDescription("This provider mounts JMX mbeans into the resource tree.")
+@Component(service = {ResourceProvider.class})
+@Designate(ocd = JMXResourceProvider.Config.class)
 public class JMXResourceProvider implements ResourceProvider {
 
     /** Configured root paths, ending with a slash */
@@ -91,9 +87,24 @@ public class JMXResourceProvider implements ResourceProvider {
     /** The mbean server. */
     private MBeanServer mbeanServer;
 
+    @SuppressWarnings("java:S100")
+    @ObjectClassDefinition(name = "Apache Sling JMX Resource Provider",
+            description = "This provider mounts JMX mbeans into the resource tree.")
+    public @interface Config {
+
+        @AttributeDefinition(name = "Root", description = "The mount point of the JMX beans")
+        String[] provider_roots() default {"/system/sling/monitoring/mbeans"};
+
+        @AttributeDefinition
+        boolean provider_useResourceAccessSecurity() default true;
+
+        @AttributeDefinition
+        boolean provider_ownsRoots() default true;
+    }
+
     @Activate
-    protected void activate(final Map<String, Object> props) {
-        final String paths[] = PropertiesUtil.toStringArray(props.get(ResourceProvider.ROOTS));
+    protected void activate(final Config config) {
+        final String paths[] = config.provider_roots();
         final List<String> rootsList = new ArrayList<>();
         final List<String> rootsWithSlashList = new ArrayList<>();
         if ( paths != null ) {
