@@ -22,15 +22,12 @@ import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(MockitoJUnitRunner.class)
 public class JMXResourceProviderTest {
 
     @Rule
@@ -40,7 +37,6 @@ public class JMXResourceProviderTest {
     @Before
     public void setUp() throws Exception {
         Dictionary<String, Object> properties = new Hashtable<>();
-
         jmxResourceProvider = context.registerInjectActivateService(JMXResourceProvider.class, new JMXResourceProvider(), properties);
     }
 

@@ -52,7 +52,6 @@ import org.apache.sling.api.resource.ResourceUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.propertytypes.ServiceDescription;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
@@ -104,7 +103,7 @@ public class JMXResourceProvider implements ResourceProvider {
 
     @Activate
     protected void activate(final Config config) {
-        final String paths[] = config.provider_roots();
+        final String[] paths = config.provider_roots();
         final List<String> rootsList = new ArrayList<>();
         final List<String> rootsWithSlashList = new ArrayList<>();
         if ( paths != null ) {
