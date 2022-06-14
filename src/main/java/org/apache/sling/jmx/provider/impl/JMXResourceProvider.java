@@ -45,29 +45,17 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceProvider;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceUtil;
-import org.apache.sling.commons.osgi.PropertiesUtil;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
-@Component(metatype=true,
-    label="Apache Sling JMX Resource Provider",
-    description="This provider mounts JMX mbeans into the resource tree.")
-@Service(value = ResourceProvider.class)
-@Properties({
-    @Property(name = ResourceProvider.ROOTS, value="/system/sling/monitoring/mbeans",
-            label="Root",
-            description="The mount point of the JMX beans"),
-    @Property(name = ResourceProvider.USE_RESOURCE_ACCESS_SECURITY, boolValue=true, propertyPrivate=true),
-    @Property(name = ResourceProvider.OWNS_ROOTS, boolValue=true, propertyPrivate=true)
-})
 /**
  * Brief summary of a "good" object name:
  *
@@ -85,6 +73,8 @@ import org.apache.sling.commons.osgi.PropertiesUtil;
  * {name property} : is the value of the name property or "{noname}" if no name property is set
  * {all other props} : name/value pairs containing all additional props
  */
+@Component(service = {ResourceProvider.class})
+@Designate(ocd = JMXResourceProvider.Config.class)
 public class JMXResourceProvider implements ResourceProvider {
 
     /** Configured root paths, ending with a slash */
@@ -96,11 +86,26 @@ public class JMXResourceProvider implements ResourceProvider {
     /** The mbean server. */
     private MBeanServer mbeanServer;
 
+    @SuppressWarnings("java:S100")
+    @ObjectClassDefinition(name = "Apache Sling JMX Resource Provider",
+            description = "This provider mounts JMX mbeans into the resource tree.")
+    public @interface Config {
+
+        @AttributeDefinition(name = "Root", description = "The mount point of the JMX beans")
+        String[] provider_roots() default {"/system/sling/monitoring/mbeans"};
+
+        @AttributeDefinition
+        boolean provider_useResourceAccessSecurity() default true;
+
+        @AttributeDefinition
+        boolean provider_ownsRoots() default true;
+    }
+
     @Activate
-    protected void activate(final Map<String, Object> props) {
-        final String paths[] = PropertiesUtil.toStringArray(props.get(ResourceProvider.ROOTS));
-        final List<String> rootsList = new ArrayList<String>();
-        final List<String> rootsWithSlashList = new ArrayList<String>();
+    protected void activate(final Config config) {
+        final String[] paths = config.provider_roots();
+        final List<String> rootsList = new ArrayList<>();
+        final List<String> rootsWithSlashList = new ArrayList<>();
         if ( paths != null ) {
             for(final String p : paths) {
                 if ( p.length() > 0 ) {
@@ -215,7 +220,7 @@ public class JMXResourceProvider implements ResourceProvider {
         Set<ObjectName> names = allNames;
         if ( prefix != null ) {
             final String pathPrefix = prefix + '/';
-            names = new HashSet<ObjectName>();
+            names = new HashSet<>();
             for(final ObjectName name : allNames) {
                 final String path = this.convertObjectNameToResourcePath(name);
                 if ( path.startsWith(pathPrefix) ) {
@@ -234,7 +239,7 @@ public class JMXResourceProvider implements ResourceProvider {
             if ( info.isRoot || info.mbeanInfo == null ) {
                 // list all MBeans
                 final Set<ObjectName> names = this.queryObjectNames(info.isRoot ? null : info.pathInfo);
-                final Set<String> filteredNames = new HashSet<String>();
+                final Set<String> filteredNames = new HashSet<>();
                 final String prefix = (info.isRoot ? null : info.pathInfo + "/");
                 for(final ObjectName name : names) {
                     final String path = this.convertObjectNameToResourcePath(name);
@@ -309,7 +314,7 @@ public class JMXResourceProvider implements ResourceProvider {
                     } else {
                         parentResource = (MBeanResource)this.getResource(parent.getResourceResolver(), parent.getPath());
                     }
-                    final List<Resource> list = new ArrayList<Resource>();
+                    final List<Resource> list = new ArrayList<>();
                     list.add(new AttributesResource(parent.getResourceResolver(), parent.getPath() + "/mbean:attributes", parentResource));
                     return list.iterator();
                 } else if ( info.pathInfo.equals("mbean:attributes") ) {
@@ -323,7 +328,7 @@ public class JMXResourceProvider implements ResourceProvider {
                     final AttributeList result = parentMBeanResource.getAttributes();
 
                     final MBeanAttributeInfo[] infos = info.mbeanInfo.getAttributes();
-                    final Map<String, MBeanAttributeInfo> infoMap = new HashMap<String, MBeanAttributeInfo>();
+                    final Map<String, MBeanAttributeInfo> infoMap = new HashMap<>();
                     for(final MBeanAttributeInfo i : infos) {
                         infoMap.put(i.getName(), i);
                     }
